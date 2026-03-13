@@ -10,8 +10,6 @@
 
 An interactive visualization tool for **memory fragmentation** and **compaction** in computer memory management. This project helps students and developers understand memory allocation algorithms and external fragmentation through visual simulation.
 
-![Main Interface](screenshot.png)
-
 ## ✨ Key Features
 
 - 🎯 **3 Allocation Algorithms**: First-fit, Best-fit, Worst-fit
