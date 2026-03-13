@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Phân Mảnh Bộ Nhớ</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="icon" href="Logo HUIT-01.ico">
+</head>
+<body>
+    <div class="khung-chinh">
+        <!-- PHẦN ĐẦU -->
+        <div class="tieu-de">
+            <div class="tieu-de-trai">
+                <img src="140.png" class="logo-image"/>
+                <div>
+                    <h1>Mô Phỏng Phân Mảnh Bộ Nhớ</h1>
+                    <p>Mô phỏng phân mảnh bộ nhớ & Dồn dịch - Đề tài 19</p>
+                </div>
+            </div>
+            <div class="thong-tin-nhanh">
+                <span class="the" id="thong-tin-ram">RAM: 1024 MB</span>
+                <span class="the" id="thong-tin-thuat-toan">First-fit</span>
+            </div>
+        </div>
+
+        <!-- BỐ CỤC CHÍNH -->
+        <div class="bo-cuc">
+
+            <!-- CỘT TRÁI -->
+            <div class="cot-trai">
+
+                <!-- Chọn thuật toán -->
+                <div class="bang-dieu-khien">
+                    <div class="tieu-de-bang">Thuật toán cấp phát</div>
+                    <div class="nhom-thuat-toan">
+                        <div class="nut-thuat-toan dang-chon" data-thuat-toan="first" onclick="chonThuatToan(this,'first')">First-fit</div>
+                        <div class="nut-thuat-toan" data-thuat-toan="best" onclick="chonThuatToan(this,'best')">Best-fit</div>
+                        <div class="nut-thuat-toan" data-thuat-toan="worst" onclick="chonThuatToan(this,'worst')">Worst-fit</div>
+                    </div>
+                    <div class="mo-ta-thuat-toan" id="mo-ta-thuat-toan">
+                        Chọn lỗ trống <strong>đầu tiên</strong> đủ lớn. Nhanh nhưng tạo nhiều phân mảnh đầu bộ nhớ.
+                    </div>
+                </div>
+
+                <!-- Thêm tiến trình -->
+                <div class="bang-dieu-khien">
+                    <div class="tieu-de-bang">Thêm tiến trình</div>
+                    <div class="nhom-nhap-lieu">
+                        <div class="nhom-form">
+                            <label class="nhan">Tên tiến trình</label>
+                            <input type="text" class="o-nhap" id="ten-tien-trinh" placeholder="P1" maxlength="6">
+                        </div>
+                        <div class="nhom-form">
+                            <label class="nhan">Kích thước (MB)</label>
+                            <input type="number" class="o-nhap" id="kich-thuoc" placeholder="64" min="1" max="1020">
+                        </div>
+                    </div>
+                    <button class="nut nut-chinh" onclick="capPhat()">+ Cấp phát</button>
+
+                    <!-- Mẫu nhanh -->
+                    <div class="khu-vuc-mau">
+                        <div class="nhan-mau">Mẫu nhanh</div>
+                        <div class="nhom-mau">
+                            <button class="nut nut-mau" onclick="themNhanh('P1',80)">P1 80MB</button>
+                            <button class="nut nut-mau" onclick="themNhanh('P2',120)">P2 120MB</button>
+                            <button class="nut nut-mau" onclick="themNhanh('P3',200)">P3 200MB</button>
+                            <button class="nut nut-mau" onclick="themNhanh('P4',50)">P4 50MB</button>
+                            <button class="nut nut-mau" onclick="taoMauThu()">🎲 Demo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách tiến trình -->
+                <div class="bang-dieu-khien bang-mem">
+                    <div class="tieu-de-bang">Tiến trình đang chạy</div>
+                    <div class="danh-sach-tien-trinh" id="danh-sach-tien-trinh">
+                        <div class="trang-thai-trong">Chưa có tiến trình nào</div>
+                    </div>
+                </div>
+
+                <!-- Thao tác bộ nhớ -->
+                <div class="bang-dieu-khien">
+                    <div class="tieu-de-bang">Thao tác bộ nhớ</div>
+                    <button class="nut nut-don-dich" onclick="donDich()" id="nut-don-dich" disabled>
+                        ⚡ Dồn dịch (Compaction)
+                    </button>
+                    <button class="nut nut-lam-lai" onclick="datLaiTatCa()">↺ Khởi tạo lại</button>
+                    <div class="mo-ta-nho">
+                        Dồn dịch gộp tất cả vùng trống rải rác thành một khối liên tục duy nhất.
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH RAM -->
+            <div class="bang-dieu-khien khung-ram">
+                <div class="hang-nhan-ram">
+                    <div class="tieu-de-bang" style="margin:0">Bộ nhớ RAM — 1024 MB</div>
+                    <div class="tong-ram">
+                        <span id="da-dung" style="color: #38bdf8">0 MB</span>
+                        <span style="color: #475569"> / 1024 MB đã dùng</span>
+                    </div>
+                </div>
+                <div class="khung-thanh-ram">
+                    <div class="thanh-ram" id="thanh-ram"></div>
+                </div>
+                <div class="thuoc-do" id="thuoc-do"></div>
+
+                <!-- Thanh tiến trình sử dụng -->
+                <div class="hang-tien-trinh">
+                    <div class="nhan-tien-trinh">
+                        <span>Đã cấp phát</span>
+                        <span id="phan-tram-da-dung">0%</span>
+                    </div>
+                    <div class="duong-tien-trinh">
+                        <div class="do-day" id="thanh-da-dung" style="background:#38bdf8;width:0%"></div>
+                    </div>
+                </div>
+                <div class="hang-tien-trinh">
+                    <div class="nhan-tien-trinh">
+                        <span style="color: #f87171">Phân mảnh ngoại vi</span>
+                        <span id="phan-tram-phan-manh" style="color: #f87171">0%</span>
+                    </div>
+                    <div class="duong-tien-trinh">
+                        <div class="do-day" id="thanh-phan-manh" style="background:#f87171;width:0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THỐNG KÊ -->
+            <div class="luoi-thong-ke">
+                <div class="the-thong-ke" style="--mau-nhan: #38bdf8">
+                    <div class="nhan-thong-ke">Đã cấp phát</div>
+                    <div class="gia-tri-thong-ke" id="thong-ke-da-dung">0 MB</div>
+                    <div class="mo-ta-thong-ke">Tổng đang dùng</div>
+                </div>
+                <div class="the-thong-ke" style="--mau-nhan: #34d399">
+                    <div class="nhan-thong-ke">Còn trống</div>
+                    <div class="gia-tri-thong-ke" id="thong-ke-con-trong">1024 MB</div>
+                    <div class="mo-ta-thong-ke">Tổng khả dụng</div>
+                </div>
+                <div class="the-thong-ke" style="--mau-nhan: #f87171">
+                    <div class="nhan-thong-ke">Tỷ lệ phân mảnh</div>
+                    <div class="gia-tri-thong-ke" id="thong-ke-phan-manh">0%</div>
+                    <div class="mo-ta-thong-ke" id="mo-ta-phan-manh">Số lỗ trống: 0</div>
+                </div>
+                <div class="the-thong-ke" style="--mau-nhan: #fbbf24">
+                    <div class="nhan-thong-ke">Tiến trình</div>
+                    <div class="gia-tri-thong-ke" id="thong-ke-tien-trinh">0</div>
+                    <div class="mo-ta-thong-ke">Đang hoạt động</div>
+                </div>
+            </div>
+
+            <!-- BẢNG SO SÁNH -->
+            <div class="bang-dieu-khien bang-so-sanh">
+                <div class="tieu-de-bang">So sánh thuật toán — Lịch sử thao tác</div>
+                <table class="bang">
+                    <thead>
+                        <tr>
+                            <th>Thuật toán</th>
+                            <th>Số lần cấp phát</th>
+                            <th>Tỷ lệ thành công</th>
+                            <th>Tổng phân mảnh TB</th>
+                            <th>Đánh giá</th>
+                        </tr>
+                    </thead>
+                    <tbody id="than-bang-so-sanh">
+                        <tr>
+                            <td class="cot-thuat-toan">First-fit</td>
+                            <td id="so-sanh-ff-cap-phat">0</td>
+                            <td id="so-sanh-ff-ty-le">—</td>
+                            <td id="so-sanh-ff-phan-manh">—</td>
+                            <td id="so-sanh-ff-danh-gia">—</td>
+                        </tr>
+                        <tr>
+                            <td class="cot-thuat-toan">Best-fit</td>
+                            <td id="so-sanh-bf-cap-phat">0</td>
+                            <td id="so-sanh-bf-ty-le">—</td>
+                            <td id="so-sanh-bf-phan-manh">—</td>
+                            <td id="so-sanh-bf-danh-gia">—</td>
+                        </tr>
+                        <tr>
+                            <td class="cot-thuat-toan">Worst-fit</td>
+                            <td id="so-sanh-wf-cap-phat">0</td>
+                            <td id="so-sanh-wf-ty-le">—</td>
+                            <td id="so-sanh-wf-phan-manh">—</td>
+                            <td id="so-sanh-wf-danh-gia">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- NHẬT KÝ -->
+            <div class="bang-dieu-khien bang-nhat-ky">
+                <div class="tieu-de-bang">Nhật ký hoạt động</div>
+                <div class="than-nhat-ky" id="than-nhat-ky">
+                    <div class="dong-nhat-ky thong-tin">
+                        <span class="thoi-gian">00:00</span>
+                        <span class="noi-dung">Hệ thống khởi động — RAM 1024 MB sẵn sàng.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
