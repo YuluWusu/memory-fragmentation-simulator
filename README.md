@@ -28,7 +28,7 @@ An interactive visualization tool for **memory fragmentation** and **compaction*
 ## 🚀 Quick Start
 
 ### Live Demo
-Visit: [https://yuluwusu.github.io/memory-fragmentation-simulator](https://yuluwusu.github.io/memory-fragmentation-simulator)
+Visit: [Demo](https://memory-fragmentation-simulator.vercel.app)
 
 ### Run Locally
 1. Clone the repository:
